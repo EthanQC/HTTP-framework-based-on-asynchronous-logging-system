@@ -1,11 +1,5 @@
-/*
- * @Author       : mark
- * @Date         : 2020-06-26
- * @copyleft Apache 2.0
- */ 
+#pragma once
 
-#ifndef BUFFER_H
-#define BUFFER_H
 #include <cstring>   //perror
 #include <iostream>
 #include <unistd.h>  // write
@@ -52,5 +46,3 @@ private:
     std::atomic<std::size_t> readPos_;
     std::atomic<std::size_t> writePos_;
 };
-
-#endif //BUFFER_H

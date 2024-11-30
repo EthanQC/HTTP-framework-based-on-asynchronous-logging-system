@@ -1,10 +1,4 @@
-/*
- * @Author       : mark
- * @Date         : 2020-06-16
- * @copyleft Apache 2.0
- */ 
-#ifndef SQLCONNPOOL_H
-#define SQLCONNPOOL_H
+#pragma once
 
 #include <mysql/mysql.h>
 #include <string>
@@ -39,6 +33,3 @@ private:
     std::mutex mtx_;
     sem_t semId_;
 };
-
-
-#endif // SQLCONNPOOL_H

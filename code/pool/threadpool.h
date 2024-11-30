@@ -1,11 +1,4 @@
-/*
- * @Author       : mark
- * @Date         : 2020-06-15
- * @copyleft Apache 2.0
- */ 
-
-#ifndef THREADPOOL_H
-#define THREADPOOL_H
+#pragma once
 
 #include <mutex>
 #include <condition_variable>
@@ -66,6 +59,3 @@ private:
     };
     std::shared_ptr<Pool> pool_;
 };
-
-
-#endif //THREADPOOL_H

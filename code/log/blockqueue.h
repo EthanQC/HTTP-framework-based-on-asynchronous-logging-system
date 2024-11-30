@@ -1,10 +1,4 @@
-/*
- * @Author       : mark
- * @Date         : 2020-06-16
- * @copyleft Apache 2.0
- */ 
-#ifndef BLOCKQUEUE_H
-#define BLOCKQUEUE_H
+#pragma once
 
 #include <mutex>
 #include <deque>
@@ -180,5 +174,3 @@ bool BlockDeque<T>::pop(T &item, int timeout) {
     condProducer_.notify_one();
     return true;
 }
-
-#endif // BLOCKQUEUE_H

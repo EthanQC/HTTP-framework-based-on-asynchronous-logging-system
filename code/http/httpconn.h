@@ -1,11 +1,4 @@
-/*
- * @Author       : mark
- * @Date         : 2020-06-15
- * @copyleft Apache 2.0
- */ 
-
-#ifndef HTTP_CONN_H
-#define HTTP_CONN_H
+#pragma once
 
 #include <sys/types.h>
 #include <sys/uio.h>     // readv/writev
@@ -71,6 +64,3 @@ private:
     HttpRequest request_;
     HttpResponse response_;
 };
-
-
-#endif //HTTP_CONN_H

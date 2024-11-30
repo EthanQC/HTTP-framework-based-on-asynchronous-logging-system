@@ -1,10 +1,4 @@
-/*
- * @Author       : mark
- * @Date         : 2020-06-17
- * @copyleft Apache 2.0
- */ 
-#ifndef HEAP_TIMER_H
-#define HEAP_TIMER_H
+#pragma once
 
 #include <queue>
 #include <unordered_map>
@@ -62,5 +56,3 @@ private:
 
     std::unordered_map<int, size_t> ref_;
 };
-
-#endif //HEAP_TIMER_H
