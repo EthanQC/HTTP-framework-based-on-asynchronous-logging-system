@@ -2,21 +2,6 @@
 
 #include <unordered_map> //无序字典容器头文件
 
-#include <fcntl.h>
-#include <unistd.h>
-
-#include <fstream> //进行文件读写操作
-#include <filesystem> //跨平台的文件系统操作接口
-#include <cstdlib> //操作环境变量
-
-#include <assert.h>
-#include <errno.h>
-
-#include <cassert> //类似于assert.h的头文件，但命名空间在std中
-#include <stdexcept> //使用异常机制代替断言，在运行时捕获和处理错误
-//static_assert用于编译期断言
-#include <system_error> //用于更现代的错误问题处理
-
 //是POSIX（可移植操作系统接口）标准的一部分，主要在UNIX/Linux系统上可用
 #include <sys/socket.h>
 #include <netinet/in.h>

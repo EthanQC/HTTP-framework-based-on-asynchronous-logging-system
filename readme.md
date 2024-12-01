@@ -36,9 +36,9 @@
 ## 现有框架
 
 * 后端
-  * main
-  * server
-  * timer
+  * main，程序入口
+  * server，包含
+  * timer，
   * pool
   * log
   * http
