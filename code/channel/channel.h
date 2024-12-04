@@ -6,15 +6,16 @@
 
 
 
-class Channel
+//封装文件描述符和与之相关的事件，持有事件的回调函数，将事件通知给poller
+class channel
 {
 public:
     typedef std::function<void()> EventCallBack;
 
-    Channel();
-    explicit Channel(int fd);
+    channel();
+    explicit channel(int fd);
 
-    ~Channel();
+    ~channel();
 
     //IO事件回调函数的调⽤接口
     //EventLoop中调⽤Loop开始事件循环 会调⽤Poll得到就绪事件

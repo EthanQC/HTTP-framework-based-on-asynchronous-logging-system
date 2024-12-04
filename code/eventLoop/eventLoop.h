@@ -11,16 +11,18 @@
 #include <thread>
 #include <mutex>
 
+#include "channel/channel.h"
 
-
-class EventLoop
+//负责整体的事件循环和调度，处理来自poller的活跃事件，调用相应的回调函数
+class eventLoop
 {
 public:
 
     typedef std::function<void()> Function;
+    
     //初始化poller, event_fd，给event_fd注册到epoll中并注册其事件处理回调
-    EventLoop();
-    ~EventLoop();
+    eventLoop();
+    ~eventLoop();
 
     //开始事件循环 调⽤该函数的线程必须是该EventLoop所在线程，也就是Loop函数不能跨线程调⽤
     void Loop();
@@ -36,16 +38,16 @@ public:
     void QueueInLoop(Function&& func);
 
     //把fd和绑定的事件注册到epoll内核事件表
-    void PollerAdd(std::shared_ptr<Channel> channel, int timeout = 0);
+    void PollerAdd(std::shared_ptr<channel> channel, int timeout = 0);
 
     //在epoll内核事件表修改fd所绑定的事件
-    void PollerMod(std::shared_ptr<Channel> channel, int timeout = 0);
+    void PollerMod(std::shared_ptr<channel> channel, int timeout = 0);
 
     //从epoll内核事件表中删除fd及其绑定的事件
-    void PollerDel(std::shared_ptr<Channel> channel);
+    void PollerDel(std::shared_ptr<channel> channel);
 
     //只关闭连接(此时还可以把缓冲区数据写完再关闭)
-    void ShutDown(std::shared_ptr<Channel> channel);
+    void ShutDown(std::shared_ptr<channel> channel);
     bool is_in_loop_thread();
 
 private:
@@ -66,19 +68,19 @@ private:
     void PerformPendingFunctions();
 
     //io多路复⽤分发器
-    std::shared_ptr<Poller> poller_;
+    std::shared_ptr<poller> poller_;
 
     //⽤于异步唤醒SubLoop的Loop函数中的Poll（epoll_wait因为还没有注册fd会⼀直阻塞）
     int event_fd_;
 
     //⽤于异步唤醒的channel
-    std::shared_ptr<Channel> wakeup_channel_;
+    std::shared_ptr<channel> wakeup_channel_;
 
     //线程id
     pid_t thread_id_;
 
-
     mutable locker::MutexLock mutex_;
+
     //正在等待处理的函数
     std::vector<Function> pending_functions_;
 

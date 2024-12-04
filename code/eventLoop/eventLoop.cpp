@@ -1,6 +1,16 @@
-#include "eventLoop.h"
+#include "eventLoop.hpp"
 
-void EventLoop::Loop()
+eventLoop::eventLoop()
+{
+
+}
+
+eventLoop::~eventLoop()
+{
+
+}
+
+void eventLoop::Loop()
 {
     //开始事件循环，调⽤该函数的线程必须是该EventLoop所在线程
     assert(!is_looping_);
@@ -29,4 +39,14 @@ void EventLoop::Loop()
     }
 
     is_looping_ = false;
+}
+
+void eventLoop::StopLoop()
+{
+
+}
+
+void eventLoop::RunInLoop(Function&& func)
+{
+
 }

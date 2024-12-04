@@ -5,13 +5,13 @@
 
 
 
-
-class Epoll
+//负责具体的I/O事件检测和channel的管理，提供统一的接口
+class epoller
 {
 public:
 
-    Epoll();
-    ~Epoll();
+    epoller();
+    ~epoller();
     void epoll_add(const sp_Channel& request);
     void epoll_mod(const sp_Channel& request);
     void epoll_del(const sp_Channel& request);
