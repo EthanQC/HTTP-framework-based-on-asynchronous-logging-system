@@ -1,6 +1,8 @@
 #pragma once
 
+//标准模板库
 #include <functional>
+//智能指针
 #include <memory>
 #include <vector>
 #include <sys/types.h>
@@ -13,12 +15,15 @@
 
 #include "channel/channel.h"
 
+//function是functional中的模板，用来统一封装具有同种返回值、参数类型但不同的可调用对象（函数、lambda等）
+//等同于：typedef std::function<void()> Function;，但用using更现代化
+//typedef：cpp11新特性，用于为现有数据类型创建别名
+using Function = std::function<void()>;
+
 //负责整体的事件循环和调度，处理来自poller的活跃事件，调用相应的回调函数
 class eventLoop
 {
 public:
-
-    typedef std::function<void()> Function;
     
     //初始化poller, event_fd，给event_fd注册到epoll中并注册其事件处理回调
     eventLoop();
@@ -48,6 +53,7 @@ public:
 
     //只关闭连接(此时还可以把缓冲区数据写完再关闭)
     void ShutDown(std::shared_ptr<channel> channel);
+
     bool is_in_loop_thread();
 
 private:

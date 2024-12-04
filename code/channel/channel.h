@@ -3,24 +3,41 @@
 #include <functional>
 #include <memory>
 #include <sys/epoll.h>
+#include <unistd.h>
 
 
+
+//typedef std::function<void()> EventCallBack;
+//定义事件回调函数类型
+using event_callback = std::function<void()>;
 
 //封装文件描述符和与之相关的事件，持有事件的回调函数，将事件通知给poller
 class channel
 {
 public:
-    typedef std::function<void()> EventCallBack;
 
-    channel();
     explicit channel(int fd);
 
     ~channel();
 
+    //获取和设置文件描述符
+    int get_fd() const;
+    void set_fd(int fd);
+
+    //设置事件与就绪事件
+    void set_events(uint32_t events);
+    void set_revents(uint32_t revents);
+
+    //设置回调函数
+    void set_read_callback(event_callback&& read_handler);
+    void set_write_callback(event_callback&& write_handler);
+    void set_update_handler(event_callback&& update_handler);
+    void set_error_handler(event_callback&& error_handler);
+
     //IO事件回调函数的调⽤接口
-    //EventLoop中调⽤Loop开始事件循环 会调⽤Poll得到就绪事件
+    //EventLoop中调⽤Loop开始事件循环，会调⽤Poll得到就绪事件
     //然后依次调⽤此函数处理就绪事件
-    void HandleEvents(); 
+    void handle_events(); 
 
     //处理读事件的回调
     void HandleRead(); 
@@ -34,22 +51,15 @@ public:
     // 处理错误事件的回调
     void HandleError();
 
-    int get_fd();
-    void set_fd(int fd);
-
     //返回weak_ptr所指向的shared_ptr对象
     std::shared_ptr<http::HttpConnection> holder();
     void set_holder(std::shared_ptr<http::HttpConnection> holder);
 
-    //设置回调函数
-    void set_read_handler(EventCallBack&& read_handler);
-    void set_write_handler(EventCallBack&& write_handler);
-    void set_update_handler(EventCallBack&& update_handler);
-    void set_error_handler(EventCallBack&& error_handler);
+    
  
-    void set_revents(int revents);
+
     int& events();
-    void set_events(int events);
+    
     int last_events();
     bool update_last_events();
 
@@ -58,13 +68,20 @@ private:
     //Channel的fd
     int fd_;
 
-    //Channel正在监听的事件（或者说感兴趣的时间）
-    int events_;
+    //Channel正在监听的事件（或者说感兴趣的事件）
+    uint32_t events_;
 
     //返回的就绪事件
-    int revents_;
+    uint32_t revents_;
 
-    //上⼀此事件（主要⽤于记录如果本次事件和上次事件⼀样，就没必要调⽤epoll_mod）
+    event_callback read_handler_; 
+    event_callback write_handler_;
+    event_callback update_handler_;
+    event_callback error_handler_;
+
+
+
+    //上⼀次事件（主要⽤于记录如果本次事件和上次事件⼀样，就没必要调⽤epoll_mod）
     int last_events_;
 
     //weak_ptr是⼀个观测者（不会增加或减少引⽤计数）
@@ -73,8 +90,5 @@ private:
     //expired函数判断当前对象是否销毁了
     std::weak_ptr<http::HttpConnection> holder_;
 
-    EventCallBack read_handler_; 
-    EventCallBack write_handler_;
-    EventCallBack update_handler_;
-    EventCallBack error_handler_;
+    
 };
