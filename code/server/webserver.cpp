@@ -8,7 +8,7 @@ WebServer::WebServer(
             const char* dbName, int connPoolNum, int threadNum,
             bool openLog, int logLevel, int logQueSize):
             port_(port), openLinger_(OptLinger), timeoutMS_(timeoutMS), isClose_(false),
-            timer_(new HeapTimer()), threadpool_(new ThreadPool(threadNum)), epoller_(new Epoller())
+            timer_(new timer()), threadpool_(new ThreadPool(threadNum)), epoller_(new Epoller())
     {
     srcDir_ = getcwd(nullptr, 256);
     assert(srcDir_);
@@ -73,7 +73,7 @@ void WebServer::Start() {
     if(!isClose_) { LOG_INFO("========== Server start =========="); }
     while(!isClose_) {
         if(timeoutMS_ > 0) {
-            timeMS = timer_->GetNextTick();
+            timeMS = timer_->getNextTick();
         }
         int eventCnt = epoller_->Wait(timeMS);
         for(int i = 0; i < eventCnt; i++) {

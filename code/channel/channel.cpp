@@ -1,4 +1,4 @@
-#include "channel.h"
+#include "channel.hpp"
 
 explicit channel::channel(int fd) : fd_(fd), events_(0), revents_(0) {}
 
@@ -30,6 +30,16 @@ void channel::set_revents(uint32_t revents)
     revents_ = revents;
 }
 
+uint32_t channel::get_events() const
+{
+    return events_;
+}
+
+uint32_t channel::get_revents() const
+{
+    return revents_;
+}
+
 void channel::set_read_callback(event_callback&& read_handler)
 {
     read_handler = std::move(read_handler);
@@ -50,40 +60,67 @@ void channel::set_error_handler(event_callback&& error_handler)
     error_handler = std::move(error_handler);
 }
 
-//IO事件的回调函数EventLoop中调⽤Loop开始事件循环，会调⽤Poll得到就绪事件
-//然后依次调⽤此函数处理就绪事件
+// IO事件的回调函数EventLoop中调⽤Loop开始事件循环，会调⽤Poll得到就绪事件
+// 然后依次调⽤此函数处理就绪事件
 void channel::handle_events()
 {
-    //清空事件状态
-    events_ = 0;
-
-    //触发挂起事件，并且没触发可读事件
+    // 处理挂起事件（EPOLLHUP）：
+    // 如果检测到对端关闭连接，但没有可读事件（EPOLLIN），调用错误回调
     if ((revents_ & EPOLLHUP) && !(revents_ & EPOLLIN))
     {
-        events_ = 0;
+        if (error_handler_) handle_error();
         return;
     }
 
-    //触发错误事件
+    // 处理错误事件（EPOLLERR）：
+    // 如果发生错误事件，调用错误回调
     if (revents_ & EPOLLERR)
     {
-        HandleError();
-        events_ = 0;
+        if (error_handler_) handle_error();
         return;
     }
 
-    //触发可读事件 | ⾼优先级可读 | 对端（客户端）关闭连接
+    // 处理可读事件（EPOLLIN、EPOLLPRI、EPOLLRDHUP）
+    // 包括普通读事件、高优先级读事件、对端半关闭事件
     if (revents_ & (EPOLLIN | EPOLLPRI | EPOLLRDHUP))
     {
-        HandleRead();
+        if (read_handler_) handle_read();
     }
 
-    //触发可写事件
+    // 处理可写事件（EPOLLOUT）
+    // 如果触发了写事件，调用写回调
     if (revents_ & EPOLLOUT)
     {
-        HandleWrite();
+        if (write_handler_) handle_write();
     }
 
-    //处理更新监听事件（EpollMod）
-    HandleUpdate();
+    // 处理更新事件（例如监听事件的修改，EpollMod）
+    // 可选逻辑，通常用于动态更新监听事件
+    if (revents_ & (EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP))
+    {
+        if (update_handler_) handle_update();
+    }
+
+    // 重置返回的事件
+    revents_ = 0;
+}
+
+void channel::handle_read()
+{
+    read_handler_();
+}
+
+void channel::handle_write()
+{
+    write_handler_();
+}
+
+void channel::handle_update()
+{
+    update_handler_();
+}
+
+void channel::handle_error()
+{
+    error_handler_();
 }
