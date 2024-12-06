@@ -12,7 +12,7 @@
 #include <sys/stat.h>         //mkdir
 
 #include "blockqueue.h"
-#include "../buffer/buffer.h"
+#include "../buffer/buffer.hpp"
 
 class Log {
 public:

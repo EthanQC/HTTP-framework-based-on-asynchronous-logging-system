@@ -42,22 +42,22 @@ uint32_t channel::get_revents() const
 
 void channel::set_read_callback(event_callback&& read_handler)
 {
-    read_handler = std::move(read_handler);
+    read_handler_ = std::move(read_handler);
 }
 
 void channel::set_write_callback(event_callback&& write_handler)
 {
-    write_handler = std::move(write_handler);
+    write_handler_ = std::move(write_handler);
 }
 
 void channel::set_update_handler(event_callback&& update_handler)
 {
-    update_handler = std::move(update_handler);
+    update_handler_ = std::move(update_handler);
 }
 
 void channel::set_error_handler(event_callback&& error_handler)
 {
-    error_handler = std::move(error_handler);
+    error_handler_ = std::move(error_handler);
 }
 
 // IO事件的回调函数EventLoop中调⽤Loop开始事件循环，会调⽤Poll得到就绪事件

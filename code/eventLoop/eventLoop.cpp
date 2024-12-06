@@ -11,12 +11,14 @@ eventLoop::eventLoop() :
     is_calling_pending_functions_(false)
 {
     // 设置wakeup_channel_的事件和回调
-    wakeup_channel_->set_events(EPOLLIN | EPOLLET);
-    wakeup_channel_->set_read_callback([this]() {this->handleRead();});
+    wakeup_channel_->set_events(EPOLLIN | EPOLLET); // 边缘触发
+    wakeup_channel_->set_read_callback([this]() {this->handleRead();}); // 完美转发
+
+    // 将wakeup_channel_注册到epoller中，以便在有唤醒请求时能够触发相应的回调
     epoller_->epoll_add(wakeup_channel_, wakeup_channel_->get_events());
 
     // 添加定时器的文件描述符到epoll中（如果定时器模块需要）
-    // 这里假设HeapTimer不需要单独的文件描述符
+    // 这里假设timer不需要单独的文件描述符
 }
 
 eventLoop::~eventLoop()
@@ -39,7 +41,7 @@ void eventLoop::loop()
     assert(is_in_loop_thread());
     is_looping_ = true;
     is_stop_ = false;
-
+ 
     while (!is_stop_)
     {
         try
@@ -145,9 +147,12 @@ void eventLoop::handleRead()
     }
 }
 
-void eventLoop::handleUpdate()
+void eventLoop::handleUpdate(int fd, uint32_t events)
 {
-    // 实现更新逻辑，如果需要的话
+    // 当需要更新channel事件时调用
+    auto ch = std::make_shared<channel>(fd);
+    ch->set_events(events);
+    epoller_->epoll_mod(ch, events);
 }
 
 void eventLoop::wakeUp()

@@ -42,7 +42,7 @@ void epoller::epoll_mod(const sp_channel& request, uint32_t events)
     ev.events = events;
     ev.data.fd = request->get_fd();
 
-    if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, request->get_fd(), &ev) < 0)
+    if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, request->get_fd(), &ev) < 0)
     {
         throw std::system_error(errno, std::system_category(), "Failed to add channel");
     }

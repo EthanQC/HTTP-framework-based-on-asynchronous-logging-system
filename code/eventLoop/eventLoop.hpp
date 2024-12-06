@@ -3,14 +3,21 @@
 #include <sys/types.h>
 #include <sys/eventfd.h>
 #include <sys/socket.h>
+
 #include <fcntl.h>
+
 #include <queue>
+
 #include <cassert>
 //#include <cstring>
 //#include <errno.h>
+
 #include <atomic>
+
 #include <thread>
+
 #include <mutex>
+
 #include "channel/channel.hpp"
 #include "epoller/epoller.hpp"
 #include "timer/timer.hpp"
@@ -65,7 +72,7 @@ private:
     void handleRead();
 
     // eventfd的更新事件回调函数（更新监听事件）
-    void handleUpdate();
+    void handleUpdate(int fd, uint32_t events);
 
     // 异步唤醒SubLoop的epoll_wait（向event_fd中写⼊数据）
     void wakeUp();
@@ -73,13 +80,14 @@ private:
     // 执⾏正在等待的函数（SubLoop注册EpollAdd连接套接字以及绑定事件的函数）
     void performPendingFunctions();
 
-    // io多路复⽤分发器
+    // io多路复⽤分发器，通过创建epoller实例来管理epoller对象
     std::shared_ptr<epoller> epoller_;
 
-    // ⽤于异步唤醒SubLoop的Loop函数中的Poll（epoll_wait因为还没有注册fd会⼀直阻塞）
+    // ⽤于异步唤醒SubLoop的Loop函数中的epoll（epoll_wait因为还没有注册fd会⼀直阻塞）
+    // 用于跨线程唤醒事件循环的文件描述符，通过createEventfd()函数创建
     int event_fd_;
 
-    // ⽤于异步唤醒的channel
+    // 封装event_fd_，⽤于异步唤醒的channel
     std::shared_ptr<channel> wakeup_channel_;
 
     // 线程id
